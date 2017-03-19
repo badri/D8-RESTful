@@ -6,81 +6,175 @@
 #+REVEAL_PLUGINS: (highlight markdown notes)
 #+OPTIONS: toc:0
 
-#+TITLE: Full stack monitoring using Sensu
+#+TITLE: RESTful services in Drupal 8
 #+AUTHOR: Lakshmi Narasimhan
 #+EMAIL: @lakshminp
 
 * About me
 #+ATTR_REVEAL: :frag (roll-in roll-in roll-in roll-in)
 - full stack developer
-- been doing devops before it was termed "devops"
+- love/hate relationship with Drupal
+- .. but mostly in love with D8 
 
 * Intro 
-#+ATTR_REVEAL: :frag (roll-in roll-in)
-- You need to monitor your stack, like NOW.
-- The open source monitoring landscape
+#+ATTR_REVEAL: :frag (roll-in roll-in roll-in roll-in)
+- REST - the Wikipedia definition
+- A way to expose resources in your app.
+- Collection of verbs and nouns
+- Stateless
 
-* But why Sensu?
+* Drupal context
+#+ATTR_REVEAL: :frag (roll-in roll-in roll-in roll-in)
+- WSCCI aims to transform Drupal from a first-class CMS to a first-class REST server
+- Helps building decoupled systems
 
-* Sensu architecture
+** History
+#+ATTR_REVEAL: :frag (roll-in roll-in roll-in roll-in)
+- Services
+- RESTWS
+- RESTful
 
-[[./images/sensu-diagram.gif]]
+** Drupal 8
+#+ATTR_REVEAL: :frag (roll-in roll-in roll-in roll-in)
+- Inspired by RESTful
+- plugin based architecture
+- granularity
+- programmability
 
-* Dashboards
+* How RESTful works
 
-** Uchiwa
+** Serialization
+#+ATTR_REVEAL: :frag (roll-in roll-in roll-in roll-in roll-in)
+- JSON
+- HAL
+- XML
+- <your own>
 
-[[./images/uchiwa.png]]
+** Resource
+*** Content
+/comment/{comment}
 
-** Graphite
+/node/{node}
 
-** Graphana
+*** Entities
+/entity/block/{block}
 
-* Sensu components
+/entity/file/{file}
 
-** Checks
+*** Config
+=/entity/image_style/{image_style}=
 
-** Handlers
+=/entity/date_format/{date_format}=
 
-** Filters
+*** Other stuff
+/dblog/{id}
 
-** Mutators
+/user/{user}
 
-* Sensu API
+/entity/view/{view}	
 
-** plugins
+*** Your own
+#+BEGIN_SRC text
+namespace Drupal\todo\Plugin\rest\resource;
 
-* Event handlers
+/**
+ * Provides a resource to get all TODOs.
+ *
+ * @RestResource(
+ *   id = "todos",
+ *   label = @Translation("Expose TODOs in our site"),
+ *   uri_paths = {
+ *     "canonical" = "/todos/{entity}"
+ *   }
+ * )
+ */
+class Todo extends ResourceBase {
+// ...
+}
+#+END_SRC
 
-** email, SMS and the whole 9 yards
+** Authentication
+#+ATTR_REVEAL: :frag (roll-in roll-in roll-in)
+- Basic
+- Cookie
+- <your own>
 
-** Custom handlers
+** Authorization
+Follows the Drupal permission system.
 
-* The ecosystem
+** Granular
+Can be tweaked on a per resource basis.
+#+BEGIN_SRC yaml
+id: entity.todo
+plugin_id: 'entity:todo'
+granularity: method
+configuration:
+  GET:
+    supported_formats:
+      - json
+    supported_auth:
+      - basic_auth
+      - cookie
+#+END_SRC
 
-** Lots of plugins
-http://sensu-plugins.io/
+* How RESTful looks
 
-** commercial flavour
+** Login
+*** Request
+#+BEGIN_SRC shell
+$ curl --include   --request POST   --header 'Content-type: application/json'   http://localhost:8000/user/login?_format=json   --data-binary '{"name":"admin", "pass":"admin"}'
+#+END_SRC
 
-** New products
+*** Response
+HTTP/1.1 200 OK
+Set-Cookie: SESS49960de5880e8c687434170f6476605b=30Nw-n-sEDBJeCVJryqkhhDLny1FudLT0KGONfafss0; expires=Sun, 26-Feb-2017 17:13:41 GMT; Max-Age=2000000; path=/; HttpOnly
+#+BEGIN_SRC text
+{
+   "current_user":{
+      "uid":"1",
+      "roles":[
+         "authenticated",
+         "administrator"
+      ],
+      "name":"admin"
+   },
+   "csrf_token":"adt7n0W1REQ95RLvJ28PcdnUFB5LPMJ1bl_nybjl2m8",
+   "logout_token":"A02NsXEcHeSwrF6pw75_2nZOoLGMSYXAODqRALT6mEQ"
+}
+#+END_SRC
 
-*** Amon
-https://www.amon.cx/
+** Create a node
+*** Request
+#+BEGIN_SRC shell
+$ curl --include \
+--request POST \
+--header 'Content-type: application/json' \
+--header 'X-CSRF-Token: adt7n0W1REQ95RLvJ28PcdnUFB5LPMJ1bl_nybjl2m8' \
+--header 'Cookie: SESS49960de5880e8c687434170f6476605b=30Nw-n-sEDBJeCVJryqkhhDLny1FudLT0KGONfafss0' \
+http://localhost:8000/entity/node?_format=json \
+--data-binary '{"title":[{"value":"Example node title with body"}],"type":[{"target_id":"article"}], "body": [{"value":"FOOO Habitant eligendi nobis nonummy, rerum facere. Error atque, praesentium, suspendisse laoreet nemo! Magni cupiditate sociosqu hac? Tristique. Necessitatibus nisl ab! Ac netus dolore leo feugiat suscipit magnam tortor mi placerat."}], "field_tags":[{"target_id": 3}, {"target_id": 2}]}'
+#+END_SRC
 
-* Examples and use cases
+*** Response
+HTTP/1.1 201 Created
+https://gist.gitqhub.com/badri/cc1d01b371a9b838da6575b2b211d96b
+#+BEGIN_SRC text
+{"nid":[{"value":"1"}],"uuid":[{"value":"182973da-694d-443a-9082-e485665e3bd4"}],"vid":[{"value":"1"}],"langcode":[{"value":"en"}],"type":[{"target_id":"article","target_type":"node_type","target_uuid":"95f1b114-3c97-4e8c-b18b-c5c8a1f7f7a5"}],"title":[{"value":"Example node title with body"}],"uid":[{"target_id":"1","target_type":"user","target_uuid":"4aa78309-82d2-4d60-b01a-78b7f8c1113a","url":"\/user\/1"}],"status":[{"value":true}],"created":[{"value":1489805159}],"changed":[{"value":1489805159}],"promote":[{"value":true}],"sticky":[{"value":false}],"revision_timestamp":[{"value":1489805159}],"revision_uid":[{"target_id":"1","target_type":"user","target_uuid":"4aa78309-82d2-4d60-b01a-78b7f8c1113a","url":"\/user\/1"}],"revision_log":[],"revision_translation_affected":[{"value":true}],"default_langcode":[{"value":true}],"path":[],"body":[{"value":"FOOO Habitant eligendi nobis nonummy, rerum facere. Error atque, praesentium, suspendisse laoreet nemo! Magni cupiditate sociosqu hac? Tristique. Necessitatibus nisl ab! Ac netus dolore leo feugiat suscipit magnam tortor mi placerat.","format":null,"summary":null}],"comment":[{"status":2,"cid":0,"last_comment_timestamp":0,"last_comment_name":null,"last_comment_uid":0,"comment_count":0}],"field_image":[],"field_tags":[{"target_id":3,"target_type":"taxonomy_term","target_uuid":"07600395-da93-4433-9f5d-d3f0f60f34dd","url":"\/taxonomy\/term\/3"},{"target_id":2,"target_type":"taxonomy_term","target_uuid":"62eaca3a-6ed1-4bd2-a4c4-4f1a3dab1559","url":"\/taxonomy\/term\/2"}]}
+#+END_SRC
 
-** Webapp
-
-** Big data stack
-
-** Containers
 
 * Resources
 
-** The art of monitoring book
-https://www.artofmonitoring.com/
+** Irresistible APIs
+http://irresistibleapis.com/
 
-** Deploy Sensu using Ansible
+** Creating maintainable APIs
+http://www.apress.com/us/book/9781484221952
+
+** Build APIs you won't hate
+https://apisyouwonthate.com/
+
+** Best practices for a RESTful API
+http://www.vinaysahni.com/best-practices-for-a-pragmatic-restful-api
 
 * ?s

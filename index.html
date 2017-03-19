@@ -3,11 +3,11 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<title>Full stack monitoring using Sensu</title>
+<title>RESTful services in Drupal 8</title>
 <meta name="author" content="(Lakshmi Narasimhan)"/>
 
-<link rel="stylesheet" href="css/reveal.css"/>
-<link rel="stylesheet" href="css/night.css" id="theme"/>
+<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/css/reveal.css"/>
+<link rel="stylesheet" href="http://cdn.jsdelivr.net/reveal.js/3.0.0/css/theme/night.css" id="theme"/>
 
 <!-- If the query includes 'print-pdf', include the PDF print sheet -->
 <script>
@@ -24,7 +24,7 @@
 <div class="reveal">
 <div class="slides">
 <section id="sec-title-slide">
-<h1>Full stack monitoring using Sensu</h1>
+<h1>RESTful services in Drupal 8</h1>
 <h2>Lakshmi Narasimhan</h2>
 <h2><a href="mailto:@lakshminp">@lakshminp</a></h2>
 <h2></h2>
@@ -35,7 +35,8 @@
 <h2 >About me</h2>
 <ul >
 <li class="fragment roll-in">full stack developer</li>
-<li class="fragment roll-in">been doing devops before it was termed "devops"</li>
+<li class="fragment roll-in">love/hate relationship with Drupal</li>
+<li class="fragment roll-in">.. but mostly in love with D8</li>
 
 </ul>
 
@@ -44,39 +45,240 @@
 
 <h2 >Intro</h2>
 <ul >
-<li class="fragment roll-in">You need to monitor your stack, like NOW.</li>
-<li class="fragment roll-in">The open source monitoring landscape</li>
+<li class="fragment roll-in">REST - the Wikipedia definition</li>
+<li class="fragment roll-in">A way to expose resources in your app.</li>
+<li class="fragment roll-in">Collection of verbs and nouns</li>
+<li class="fragment roll-in">Stateless</li>
 
 </ul>
 
 </section>
 <section id="sec-3">
 
-<h2 >But why Sensu?</h2>
+<h2 >Drupal context</h2>
+<ul >
+<li class="fragment roll-in">WSCCI aims to transform Drupal from a first-class CMS to a first-class REST server</li>
+<li class="fragment roll-in">Helps building decoupled systems</li>
+
+</ul>
+
+</section>
+<section>
+<section id="sec-3-1">
+
+<h3 >History</h3>
+<ul >
+<li class="fragment roll-in">Services</li>
+<li class="fragment roll-in">RESTWS</li>
+<li class="fragment roll-in">RESTful</li>
+
+</ul>
+</section>
+
+</section>
+<section>
+<section id="sec-3-2">
+
+<h3 >Drupal 8</h3>
+<ul >
+<li class="fragment roll-in">Inspired by RESTful</li>
+<li class="fragment roll-in">plugin based architecture</li>
+<li class="fragment roll-in">granularity</li>
+<li class="fragment roll-in">programmability</li>
+
+</ul>
+</section>
 
 </section>
 <section id="sec-4">
 
-<h2 >Sensu architecture</h2>
+<h2 >How RESTful works</h2>
+</section>
+<section>
+<section id="sec-4-1">
 
-<div class="figure">
-<p><img src="./images/sensu-diagram.gif" alt="sensu-diagram.gif" />
+<h3 >Serialization</h3>
+<ul >
+<li class="fragment roll-in">JSON</li>
+<li class="fragment roll-in">HAL</li>
+<li class="fragment roll-in">XML</li>
+<li class="fragment roll-in">&lt;your own&gt;</li>
+
+</ul>
+</section>
+
+</section>
+<section>
+<section id="sec-4-2">
+
+<h3 >Resource</h3>
+</section>
+<section id="sec-4-2-1">
+
+<h4 >Content</h4>
+<p>
+/comment/{comment}
 </p>
+
+<p>
+/node/{node}
+</p>
+
+</section>
+<section id="sec-4-2-2">
+
+<h4 >Entities</h4>
+<p>
+/entity/block/{block}
+</p>
+
+<p>
+/entity/file/{file}
+</p>
+
+</section>
+<section id="sec-4-2-3">
+
+<h4 >Config</h4>
+<p>
+/entity/image<sub>style</sub>/{image<sub>style</sub>}
+</p>
+
+<p>
+/entity/date<sub>format</sub>/{date<sub>format</sub>}
+</p>
+
+</section>
+<section id="sec-4-2-4">
+
+<h4 >Other stuff</h4>
+<p>
+/dblog/{id}
+</p>
+
+<p>
+/user/{user}
+</p>
+
+<p>
+/entity/view/{view}        
+</p>
+
+</section>
+<section id="sec-4-2-5">
+
+<h4 >Your own</h4>
+<div class="org-src-container">
+
+<pre  class="src src-text">namespace Drupal\todo\Plugin\rest\resource;
+
+/**
+ * Provides a resource to get all TODOs.
+ *
+ * @RestResource(
+ *   id = "todos",
+ *   label = @Translation("Expose TODOs in our site"),
+ *   uri_paths = {
+ *     "canonical" = "/todos/{entity}"
+ *   }
+ * )
+ */
+class Todo extends ResourceBase {
+// ...
+}
+</pre>
 </div>
+</section>
+
+</section>
+<section>
+<section id="sec-4-3">
+
+<h3 >Authentication</h3>
+<ul >
+<li class="fragment roll-in">Basic</li>
+<li class="fragment roll-in">Cookie</li>
+<li class="fragment roll-in">&lt;your own&gt;</li>
+
+</ul>
+</section>
+
+</section>
+<section>
+<section id="sec-4-4">
+
+<h3 >Authorization</h3>
+<p>
+Follows the Drupal permission system.
+</p>
+</section>
+
+</section>
+<section>
+<section id="sec-4-5">
+
+<h3 >Granular</h3>
+<p>
+Can be tweaked on a per resource basis.
+</p>
+<div class="org-src-container">
+
+<pre  class="src src-yaml"><span style="color: #7DAF9C;">id</span>: entity.todo
+<span style="color: #7DAF9C;">plugin_id</span>: <span style="color: #D9D762;">'entity:todo'</span>
+<span style="color: #7DAF9C;">granularity</span>: method
+<span style="color: #7DAF9C;">configuration</span>:
+  <span style="color: #7DAF9C;">GET</span>:
+    <span style="color: #7DAF9C;">supported_formats</span>:
+      - json
+    <span style="color: #7DAF9C;">supported_auth</span>:
+      - basic_auth
+      - cookie
+</pre>
+</div>
+</section>
 
 </section>
 <section id="sec-5">
 
-<h2 >Dashboards</h2>
+<h2 >How RESTful looks</h2>
 </section>
 <section>
 <section id="sec-5-1">
 
-<h3 >Uchiwa</h3>
+<h3 >Login</h3>
+</section>
+<section id="sec-5-1-1">
 
-<div class="figure">
-<p><img src="./images/uchiwa.png" alt="uchiwa.png" />
+<h4 >Request</h4>
+<div class="org-src-container">
+
+<pre  class="src src-shell">$ curl --include   --request POST   --header <span style="color: #D9D762;">'Content-type: application/json'</span>   http://localhost:8000/user/login?<span style="color: #7DAF9C;">_format</span>=json   --data-binary <span style="color: #D9D762;">'{"name":"admin", "pass":"admin"}'</span>
+</pre>
+</div>
+
+</section>
+<section id="sec-5-1-2">
+
+<h4 >Response</h4>
+<p>
+HTTP/1.1 200 OK
+Set-Cookie: SESS49960de5880e8c687434170f6476605b=30Nw-n-sEDBJeCVJryqkhhDLny1FudLT0KGONfafss0; expires=Sun, 26-Feb-2017 17:13:41 GMT; Max-Age=2000000; path=/; HttpOnly
 </p>
+<div class="org-src-container">
+
+<pre  class="src src-text">{
+   "current_user":{
+      "uid":"1",
+      "roles":[
+         "authenticated",
+         "administrator"
+      ],
+      "name":"admin"
+   },
+   "csrf_token":"adt7n0W1REQ95RLvJ28PcdnUFB5LPMJ1bl_nybjl2m8",
+   "logout_token":"A02NsXEcHeSwrF6pw75_2nZOoLGMSYXAODqRALT6mEQ"
+}
+</pre>
 </div>
 </section>
 
@@ -84,168 +286,93 @@
 <section>
 <section id="sec-5-2">
 
-<h3 >Graphite</h3>
+<h3 >Create a node</h3>
 </section>
+<section id="sec-5-2-1">
+
+<h4 >Request</h4>
+<div class="org-src-container">
+
+<pre  class="src src-shell">$ curl --include <span style="color: #D9D762;">\</span>
+--request POST <span style="color: #D9D762;">\</span>
+--header <span style="color: #D9D762;">'Content-type: application/json'</span> <span style="color: #D9D762;">\</span>
+--header <span style="color: #D9D762;">'X-CSRF-Token: adt7n0W1REQ95RLvJ28PcdnUFB5LPMJ1bl_nybjl2m8'</span> <span style="color: #D9D762;">\</span>
+--header <span style="color: #D9D762;">'Cookie: SESS49960de5880e8c687434170f6476605b=30Nw-n-sEDBJeCVJryqkhhDLny1FudLT0KGONfafss0'</span> <span style="color: #D9D762;">\</span>
+http://localhost:8000/entity/node?<span style="color: #7DAF9C;">_format</span>=json <span style="color: #D9D762;">\</span>
+--data-binary <span style="color: #D9D762;">'{"title":[{"value":"Example node title with body"}],"type":[{"target_id":"article"}], "body": [{"value":"FOOO Habitant eligendi nobis nonummy, rerum facere. Error atque, praesentium, suspendisse laoreet nemo! Magni cupiditate sociosqu hac? Tristique. Necessitatibus nisl ab! Ac netus dolore leo feugiat suscipit magnam tortor mi placerat."}], "field_tags":[{"target_id": 3}, {"target_id": 2}]}'</span>
+</pre>
+</div>
 
 </section>
-<section>
-<section id="sec-5-3">
+<section id="sec-5-2-2">
 
-<h3 >Graphana</h3>
+<h4 >Response</h4>
+<p>
+HTTP/1.1 201 Created
+<a href="https://gist.gitqhub.com/badri/cc1d01b371a9b838da6575b2b211d96b">https://gist.gitqhub.com/badri/cc1d01b371a9b838da6575b2b211d96b</a>
+</p>
+<div class="org-src-container">
+
+<pre  class="src src-text">{"nid":[{"value":"1"}],"uuid":[{"value":"182973da-694d-443a-9082-e485665e3bd4"}],"vid":[{"value":"1"}],"langcode":[{"value":"en"}],"type":[{"target_id":"article","target_type":"node_type","target_uuid":"95f1b114-3c97-4e8c-b18b-c5c8a1f7f7a5"}],"title":[{"value":"Example node title with body"}],"uid":[{"target_id":"1","target_type":"user","target_uuid":"4aa78309-82d2-4d60-b01a-78b7f8c1113a","url":"\/user\/1"}],"status":[{"value":true}],"created":[{"value":1489805159}],"changed":[{"value":1489805159}],"promote":[{"value":true}],"sticky":[{"value":false}],"revision_timestamp":[{"value":1489805159}],"revision_uid":[{"target_id":"1","target_type":"user","target_uuid":"4aa78309-82d2-4d60-b01a-78b7f8c1113a","url":"\/user\/1"}],"revision_log":[],"revision_translation_affected":[{"value":true}],"default_langcode":[{"value":true}],"path":[],"body":[{"value":"FOOO Habitant eligendi nobis nonummy, rerum facere. Error atque, praesentium, suspendisse laoreet nemo! Magni cupiditate sociosqu hac? Tristique. Necessitatibus nisl ab! Ac netus dolore leo feugiat suscipit magnam tortor mi placerat.","format":null,"summary":null}],"comment":[{"status":2,"cid":0,"last_comment_timestamp":0,"last_comment_name":null,"last_comment_uid":0,"comment_count":0}],"field_image":[],"field_tags":[{"target_id":3,"target_type":"taxonomy_term","target_uuid":"07600395-da93-4433-9f5d-d3f0f60f34dd","url":"\/taxonomy\/term\/3"},{"target_id":2,"target_type":"taxonomy_term","target_uuid":"62eaca3a-6ed1-4bd2-a4c4-4f1a3dab1559","url":"\/taxonomy\/term\/2"}]}
+</pre>
+</div>
 </section>
+
 
 </section>
 <section id="sec-6">
 
-<h2 >Sensu components</h2>
+<h2 >Resources</h2>
 </section>
 <section>
 <section id="sec-6-1">
 
-<h3 >Checks</h3>
+<h3 >Irresistible APIs</h3>
+<p>
+<a href="http://irresistibleapis.com/">http://irresistibleapis.com/</a>
+</p>
 </section>
 
 </section>
 <section>
 <section id="sec-6-2">
 
-<h3 >Handlers</h3>
+<h3 >Creating maintainable APIs</h3>
+<p>
+<a href="http://www.apress.com/us/book/9781484221952">http://www.apress.com/us/book/9781484221952</a>
+</p>
 </section>
 
 </section>
 <section>
 <section id="sec-6-3">
 
-<h3 >Filters</h3>
+<h3 >Build APIs you won't hate</h3>
+<p>
+<a href="https://apisyouwonthate.com/">https://apisyouwonthate.com/</a>
+</p>
 </section>
 
 </section>
 <section>
 <section id="sec-6-4">
 
-<h3 >Mutators</h3>
+<h3 >Best practices for a RESTful API</h3>
+<p>
+<a href="http://www.vinaysahni.com/best-practices-for-a-pragmatic-restful-api">http://www.vinaysahni.com/best-practices-for-a-pragmatic-restful-api</a>
+</p>
 </section>
 
 </section>
 <section id="sec-7">
-
-<h2 >Sensu API</h2>
-</section>
-<section>
-<section id="sec-7-1">
-
-<h3 >plugins</h3>
-</section>
-
-</section>
-<section id="sec-8">
-
-<h2 >Event handlers</h2>
-</section>
-<section>
-<section id="sec-8-1">
-
-<h3 >email, SMS and the whole 9 yards</h3>
-</section>
-
-</section>
-<section>
-<section id="sec-8-2">
-
-<h3 >Custom handlers</h3>
-</section>
-
-</section>
-<section id="sec-9">
-
-<h2 >The ecosystem</h2>
-</section>
-<section>
-<section id="sec-9-1">
-
-<h3 >Lots of plugins</h3>
-<p>
-<a href="http://sensu-plugins.io/">http://sensu-plugins.io/</a>
-</p>
-</section>
-
-</section>
-<section>
-<section id="sec-9-2">
-
-<h3 >commercial flavour</h3>
-</section>
-
-</section>
-<section>
-<section id="sec-9-3">
-
-<h3 >New products</h3>
-</section>
-<section id="sec-9-3-1">
-
-<h4 >Amon</h4>
-<p>
-<a href="https://www.amon.cx/">https://www.amon.cx/</a>
-</p>
-</section>
-
-</section>
-<section id="sec-10">
-
-<h2 >Examples and use cases</h2>
-</section>
-<section>
-<section id="sec-10-1">
-
-<h3 >Webapp</h3>
-</section>
-
-</section>
-<section>
-<section id="sec-10-2">
-
-<h3 >Big data stack</h3>
-</section>
-
-</section>
-<section>
-<section id="sec-10-3">
-
-<h3 >Containers</h3>
-</section>
-
-</section>
-<section id="sec-11">
-
-<h2 >Resources</h2>
-</section>
-<section>
-<section id="sec-11-1">
-
-<h3 >The art of monitoring book</h3>
-<p>
-<a href="https://www.artofmonitoring.com/">https://www.artofmonitoring.com/</a>
-</p>
-</section>
-
-</section>
-<section>
-<section id="sec-11-2">
-
-<h3 >Deploy Sensu using Ansible</h3>
-</section>
-
-</section>
-<section id="sec-12">
 
 <h2 >?s</h2>
 </section>
 </div>
 </div>
 
-<script src="js/head.min.js"></script>
-<script src="js/reveal.js"></script>
+<script src="http://cdn.jsdelivr.net/reveal.js/3.0.0/lib/js/head.min.js"></script>
+<script src="http://cdn.jsdelivr.net/reveal.js/3.0.0/js/reveal.js"></script>
 
 <script>
 // Full list of configuration options available here:
@@ -272,6 +399,10 @@ multiplex: {
 
 // Optional libraries used to extend on reveal.js
 dependencies: [
+ { src: 'http://cdn.jsdelivr.net/reveal.js/3.0.0/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+ { src: 'http://cdn.jsdelivr.net/reveal.js/3.0.0/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+ { src: 'http://cdn.jsdelivr.net/reveal.js/3.0.0/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+ { src: 'http://cdn.jsdelivr.net/reveal.js/3.0.0/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
 ]
 });
 </script>
